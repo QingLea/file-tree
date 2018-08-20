@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liqing.treedemo.mapper.RelationMapper">
+    <resultMap id="BaseResultMap" type="com.liqing.treedemo.model.Relation">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="PARENT_ID" property="parentId" jdbcType="INTEGER"/>
+        <result column="CHILD_ID" property="childId" jdbcType="INTEGER"/>
+        <result column="depth" property="depth" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="RelatedFolderResultMap" type="com.liqing.treedemo.model.RelatedFolder">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="depth" property="depth" jdbcType="INTEGER"/>
+        <result column="folder_name" property="folderName" jdbcType="VARCHAR"/>
+        <result column="CHILD_ID" property="childId" jdbcType="INTEGER"/>
+        <result column="PARENT_ID" property="parentId" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, PARENT_ID, CHILD_ID, depth
+    </sql>
+    <!--SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT-->
+    <select id="selectParents" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
+        select
+            f.id,
+            f.folder_name,
+            t.depth,
+            t.CHILD_ID,
+            t.PARENT_ID
+        from tree_relation t, tree_folder f
+        where t.CHILD_ID = #{childId,jdbcType=INTEGER} and t.PARENT_ID = f.id
+    </select>
+    <select id="selectChildren" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
+        SELECT
+            f.id,
+            f.folder_name,
+            t.depth,
+            t.CHILD_ID,
+            t.PARENT_ID
+        FROM
+            tree_relation t,
+            tree_folder f
+        WHERE
+            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+            AND t.CHILD_ID = f.id
+    </select>
+    <select id="selectDirectChildren" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
+        SELECT
+            f.id,
+            f.folder_name,
+            t.depth,
+            t.CHILD_ID,
+            t.PARENT_ID
+        FROM
+            tree_relation t,
+            tree_folder f
+        WHERE
+            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+            AND t.CHILD_ID = f.id AND t.depth = 1
+    </select>
+    <!--DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE-->
+
+    <delete id="detachFromOldParents" parameterType="java.lang.Integer">
+        DELETE a
+        FROM
+            tree_relation AS a
+            JOIN tree_relation AS d ON a.CHILD_ID = d.CHILD_ID
+            LEFT JOIN tree_relation AS x ON x.PARENT_ID = d.PARENT_ID
+                                            AND x.CHILD_ID = a.PARENT_ID
+        WHERE
+            d.PARENT_ID = #{nodeId,jdbcType=INTEGER}
+            AND x.PARENT_ID IS NULL;
+    </delete>
+
+    <!--INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT-->
+    <insert id="appendChildNode" parameterType="com.liqing.treedemo.model.Relation">
+        INSERT INTO tree_relation (PARENT_ID, CHILD_ID, depth)
+            SELECT
+                t.PARENT_ID,
+                #{childId,jdbcType=INTEGER},
+                t.depth + 1
+            FROM tree_relation AS t
+            WHERE t.CHILD_ID = #{parentId,jdbcType=INTEGER}
+            UNION ALL SELECT
+                          #{childId,jdbcType=INTEGER},
+                          #{childId,jdbcType=INTEGER},
+                          0
+    </insert>
+    <insert id="attachToNewParents" parameterType="java.lang.Integer">
+        INSERT INTO
+            tree_relation (PARENT_ID, CHILD_ID, depth)
+            SELECT
+                supertree.PARENT_ID,
+                subtree.CHILD_ID,
+                supertree.depth + subtree.depth + 1
+            FROM
+                tree_relation AS supertree
+                JOIN tree_relation AS subtree
+            WHERE
+                subtree.PARENT_ID = #{param1,jdbcType=INTEGER}
+                AND
+                supertree.CHILD_ID = #{param2,jdbcType=INTEGER};
+    </insert>
+
+    <!--UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE-->
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liqing.treedemo.mapper.FolderMapper">
+    <resultMap id="BaseResultMap" type="com.liqing.treedemo.model.Folder">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="folder_name" property="folderName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, folder_name
+    </sql>
+    <!--SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT-->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from tree_folder
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <!--DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from tree_folder
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <!--INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT INSERT-->
+    <insert id="insertSelective" parameterType="com.liqing.treedemo.model.Folder" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into tree_folder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="folderName != null">
+                folder_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="folderName != null">
+                #{folderName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <!--UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE UPDATE-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.liqing.treedemo.model.Folder">
+        update tree_folder
+        <set>
+            <if test="folderName != null">
+                folder_name = #{folderName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>
