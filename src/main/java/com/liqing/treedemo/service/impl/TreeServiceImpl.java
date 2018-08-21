@@ -66,26 +66,18 @@ public class TreeServiceImpl implements TreeService {
         return parents;
     }
 
-    @Transactional
     @Override
     public void copy(Integer folderId, Integer destFolderId) {
         Folder old = folderMapper.selectByPrimaryKey(folderId);
-        Folder folder = new Folder();
-        folder.setFolderName(old.getFolderName());
-        folderMapper.insertSelective(folder);
-
-        Relation relation = new Relation();
-        relation.setParentId(destFolderId);
-        relation.setChildId(folder.getId());
-        relationMapper.appendChildNode(relation);
-//        TODO 复制根文件夹中的文件
-//        递归复制子文件夹
-        copyChildren(folderId, folder.getId());
+        copy(old, destFolderId);
     }
 
     @Transactional
     @Override
     public void copy(Folder folder, Integer destFolderId) {
+        if (isCopyConflict(folder.getId(), destFolderId)) {
+            throw new RuntimeException("复制目标非法！");
+        }
         Folder f = new Folder();
         f.setFolderName(folder.getFolderName());
         folderMapper.insertSelective(f);
@@ -97,6 +89,11 @@ public class TreeServiceImpl implements TreeService {
 //        TODO 复制根文件夹中的文件
 //        递归复制子文件夹
         copyChildren(folder.getId(), f.getId());
+    }
+
+    private boolean isCopyConflict(int folderId, int destId) {
+        List<RelatedFolder> folders = relationMapper.selectChildren(folderId);
+        return folders.stream().anyMatch(x -> x.getChildId() == destId);
     }
 
     private void copyChildren(Integer folderId, Integer destFolderId) {

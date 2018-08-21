@@ -60,24 +60,9 @@ public class TreedemoApplicationTests {
         children.forEach(System.out::println);
     }
 
-    //    @Test
-    public void testListChild1(Integer id) {
-        List<RelatedFolder> children = relationMapper.selectChildren(id);
-        children.sort(Comparator.comparingInt(RelatedFolder::getDepth));
-        children.forEach(System.out::println);
-    }
-
-    //    @Test
-    public void testListChild2(Integer id) {
-        List<RelatedFolder> children = relationMapper.selectChildren(id);
-        children.sort(Comparator.comparingInt(RelatedFolder::getDepth));
-        children.forEach(System.out::println);
-    }
-
-
     @Test
     public void testFindFather() {
-        List<RelatedFolder> relatedFolders = relationMapper.selectParents(24);
+        List<RelatedFolder> relatedFolders = relationMapper.selectParents(34);
         relatedFolders.sort(Comparator.comparingInt(RelatedFolder::getDepth).reversed());
         relatedFolders.forEach(System.out::println);
 
@@ -95,10 +80,12 @@ public class TreedemoApplicationTests {
 
     @Test
     public void testCopy() {
-        service.copy(30, 34);
-        testListChild1(30);
+        int folderId = 34;
+        int destFolderId = 26;
+        service.copy(folderId, destFolderId);
+        testListChild1(folderId);
         System.out.println();
-        testListChild2(34);
+        testListChild2(destFolderId);
     }
 
     @Test
@@ -106,5 +93,27 @@ public class TreedemoApplicationTests {
         testListChild1(15);
         System.out.println();
         testListChild2(15);
+    }
+
+    private void testListChild1(Integer id) {
+        List<RelatedFolder> children = relationMapper.selectChildren(id);
+        children.sort(Comparator.comparingInt(RelatedFolder::getDepth));
+        children.forEach(System.out::println);
+    }
+
+    private void testListChild2(Integer id) {
+        List<RelatedFolder> children = relationMapper.selectChildren(id);
+        children.sort(Comparator.comparingInt(RelatedFolder::getDepth));
+        children.forEach(System.out::println);
+    }
+
+
+    @Test
+    public void testCopyFatherToChild() {
+        int srcId = 34;
+        int destId = 34;
+        List<RelatedFolder> folders = relationMapper.selectChildren(srcId);
+        boolean conflict = folders.stream().anyMatch(x -> x.getChildId() == destId);
+        System.out.println(conflict);
     }
 }
