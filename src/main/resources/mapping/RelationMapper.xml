@@ -18,6 +18,35 @@
         id, PARENT_ID, CHILD_ID, depth
     </sql>
     <!--SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT-->
+    <select id="selectRelatedFolder" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
+        SELECT
+            f.id,
+            f.folder_name,
+            t.depth,
+            t.CHILD_ID,
+            t.PARENT_ID
+        FROM
+            tree_relation t,
+            tree_folder f
+        WHERE
+            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+            AND t.CHILD_ID = f.id AND t.depth = 0
+    </select>
+    <select id="selectFather" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
+        SELECT
+            f.id,
+            f.folder_name,
+            t.depth,
+            t.CHILD_ID,
+            t.PARENT_ID
+        FROM
+            tree_relation t,
+            tree_folder f
+        WHERE
+            t.CHILD_ID = #{parentId,jdbcType=INTEGER}
+            AND t.PARENT_ID = f.id AND t.depth = 1
+    </select>
+
     <select id="selectParents" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         select
             f.id,

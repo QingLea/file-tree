@@ -9,11 +9,15 @@ import java.util.List;
 @Repository
 public interface RelationMapper {
 
-    List<RelatedFolder> selectParents(Integer childId);
+    List<RelatedFolder> selectParents(Integer folderId);
 
     List<RelatedFolder> selectChildren(Integer parentId);
 
     List<RelatedFolder> selectDirectChildren(Integer parentId);
+
+    RelatedFolder selectFather(Integer folderId);
+
+    RelatedFolder selectRelatedFolder(Integer id);
 
     int appendChildNode(Relation relation);
 
