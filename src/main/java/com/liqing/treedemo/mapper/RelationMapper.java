@@ -1,6 +1,6 @@
 package com.liqing.treedemo.mapper;
 
-import com.liqing.treedemo.model.RelatedFolder;
+import com.liqing.treedemo.model.bo.RelatedFolder;
 import com.liqing.treedemo.model.Relation;
 import org.springframework.stereotype.Repository;
 

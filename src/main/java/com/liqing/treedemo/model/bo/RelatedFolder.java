@@ -1,17 +1,25 @@
-package com.liqing.treedemo.model;
+package com.liqing.treedemo.model.bo;
 
 public class RelatedFolder {
 
-    private Integer id;
+    private Integer folderId;
     private String folderName;
     private Integer depth;
     private Integer childId;
     private Integer parentId;
 
+    public Integer getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(Integer folderId) {
+        this.folderId = folderId;
+    }
+
     @Override
     public String toString() {
         return "RelatedFolder{" +
-                "id=" + id +
+                "folderId=" + folderId +
                 ", folderName='" + folderName + '\'' +
                 ", depth=" + depth +
                 ", childId=" + childId +
@@ -33,14 +41,6 @@ public class RelatedFolder {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getDepth() {

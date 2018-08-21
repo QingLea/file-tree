@@ -3,7 +3,7 @@ package com.liqing.treedemo.service.impl;
 import com.liqing.treedemo.mapper.FolderMapper;
 import com.liqing.treedemo.mapper.RelationMapper;
 import com.liqing.treedemo.model.Folder;
-import com.liqing.treedemo.model.RelatedFolder;
+import com.liqing.treedemo.model.bo.RelatedFolder;
 import com.liqing.treedemo.model.Relation;
 import com.liqing.treedemo.service.TreeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +64,48 @@ public class TreeServiceImpl implements TreeService {
         List<RelatedFolder> parents = relationMapper.selectParents(folderId);
         parents.sort(Comparator.comparingInt(RelatedFolder::getDepth).reversed());
         return parents;
+    }
+
+    @Transactional
+    @Override
+    public void copy(Integer folderId, Integer destFolderId) {
+        Folder old = folderMapper.selectByPrimaryKey(folderId);
+        Folder folder = new Folder();
+        folder.setFolderName(old.getFolderName());
+        folderMapper.insertSelective(folder);
+
+        Relation relation = new Relation();
+        relation.setParentId(destFolderId);
+        relation.setChildId(folder.getId());
+        relationMapper.appendChildNode(relation);
+//        TODO 复制根文件夹中的文件
+//        递归复制子文件夹
+        copyChildren(folderId, folder.getId());
+    }
+
+    @Transactional
+    @Override
+    public void copy(Folder folder, Integer destFolderId) {
+        Folder f = new Folder();
+        f.setFolderName(folder.getFolderName());
+        folderMapper.insertSelective(f);
+
+        Relation relation = new Relation();
+        relation.setParentId(destFolderId);
+        relation.setChildId(f.getId());
+        relationMapper.appendChildNode(relation);
+//        TODO 复制根文件夹中的文件
+//        递归复制子文件夹
+        copyChildren(folder.getId(), f.getId());
+    }
+
+    private void copyChildren(Integer folderId, Integer destFolderId) {
+        List<RelatedFolder> children = relationMapper.selectDirectChildren(folderId);
+        if (children.size() > 0) {
+            for (RelatedFolder f : children) {
+                copy(f.getChildId(), destFolderId);
+            }
+        }
     }
 
 }

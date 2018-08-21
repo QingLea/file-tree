@@ -7,8 +7,8 @@
         <result column="CHILD_ID" property="childId" jdbcType="INTEGER"/>
         <result column="depth" property="depth" jdbcType="INTEGER"/>
     </resultMap>
-    <resultMap id="RelatedFolderResultMap" type="com.liqing.treedemo.model.RelatedFolder">
-        <id column="id" property="id" jdbcType="INTEGER"/>
+    <resultMap id="RelatedFolderResultMap" type="com.liqing.treedemo.model.bo.RelatedFolder">
+        <id column="id" property="folderId" jdbcType="INTEGER"/>
         <result column="depth" property="depth" jdbcType="INTEGER"/>
         <result column="folder_name" property="folderName" jdbcType="VARCHAR"/>
         <result column="CHILD_ID" property="childId" jdbcType="INTEGER"/>
@@ -17,73 +17,61 @@
     <sql id="Base_Column_List">
         id, PARENT_ID, CHILD_ID, depth
     </sql>
+    <sql id="Relation_Base_Column_List">
+        f.id,
+        f.folder_name,
+        t.depth,
+        t.CHILD_ID,
+        t.PARENT_ID
+    </sql>
     <!--SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT SELECT-->
     <select id="selectRelatedFolder" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         SELECT
-            f.id,
-            f.folder_name,
-            t.depth,
-            t.CHILD_ID,
-            t.PARENT_ID
+        <include refid="Relation_Base_Column_List"/>
         FROM
-            tree_relation t,
-            tree_folder f
+        tree_relation t,
+        tree_folder f
         WHERE
-            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
-            AND t.CHILD_ID = f.id AND t.depth = 0
+        t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+        AND t.CHILD_ID = f.id AND t.depth = 0
     </select>
     <select id="selectFather" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         SELECT
-            f.id,
-            f.folder_name,
-            t.depth,
-            t.CHILD_ID,
-            t.PARENT_ID
+        <include refid="Relation_Base_Column_List"/>
+
         FROM
-            tree_relation t,
-            tree_folder f
+        tree_relation t,
+        tree_folder f
         WHERE
-            t.CHILD_ID = #{parentId,jdbcType=INTEGER}
-            AND t.PARENT_ID = f.id AND t.depth = 1
+        t.CHILD_ID = #{parentId,jdbcType=INTEGER}
+        AND t.PARENT_ID = f.id AND t.depth = 1
     </select>
 
     <select id="selectParents" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         select
-            f.id,
-            f.folder_name,
-            t.depth,
-            t.CHILD_ID,
-            t.PARENT_ID
+        <include refid="Relation_Base_Column_List"/>
         from tree_relation t, tree_folder f
         where t.CHILD_ID = #{childId,jdbcType=INTEGER} and t.PARENT_ID = f.id
     </select>
     <select id="selectChildren" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         SELECT
-            f.id,
-            f.folder_name,
-            t.depth,
-            t.CHILD_ID,
-            t.PARENT_ID
+        <include refid="Relation_Base_Column_List"/>
         FROM
-            tree_relation t,
-            tree_folder f
+        tree_relation t,
+        tree_folder f
         WHERE
-            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
-            AND t.CHILD_ID = f.id
+        t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+        AND t.CHILD_ID = f.id
     </select>
     <select id="selectDirectChildren" resultMap="RelatedFolderResultMap" parameterType="java.lang.Integer">
         SELECT
-            f.id,
-            f.folder_name,
-            t.depth,
-            t.CHILD_ID,
-            t.PARENT_ID
+        <include refid="Relation_Base_Column_List"/>
         FROM
-            tree_relation t,
-            tree_folder f
+        tree_relation t,
+        tree_folder f
         WHERE
-            t.PARENT_ID = #{parentId,jdbcType=INTEGER}
-            AND t.CHILD_ID = f.id AND t.depth = 1
+        t.PARENT_ID = #{parentId,jdbcType=INTEGER}
+        AND t.CHILD_ID = f.id AND t.depth = 1
     </select>
     <!--DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE-->
 

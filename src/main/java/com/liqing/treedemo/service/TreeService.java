@@ -1,6 +1,7 @@
 package com.liqing.treedemo.service;
 
-import com.liqing.treedemo.model.RelatedFolder;
+import com.liqing.treedemo.model.Folder;
+import com.liqing.treedemo.model.bo.RelatedFolder;
 
 import java.util.List;
 
@@ -10,6 +11,10 @@ public interface TreeService {
     void move(Integer movedFolderId, Integer destFolderId);
 
     void delete(Integer folderId);
+
+    void copy(Integer folderId, Integer destFolderId);
+
+    void copy(Folder folder, Integer destFolderId);
 
     List<RelatedFolder> listDirectChildrenFolder(Integer parentFolderId);
 
