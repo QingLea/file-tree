@@ -15,3 +15,5 @@
 数据库链接在application.yml中编辑
 #### 环境：
 jdk8，mysql57
+#### 文件树结构：
+![文件树](https://raw.githubusercontent.com/fatcats/treedemo/master/tree.png)
